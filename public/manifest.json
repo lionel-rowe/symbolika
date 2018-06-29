@@ -1,0 +1,19 @@
+{
+  "short_name": "Special Characters",
+  "name": "Special Characters",
+  "manifest_version": 2,
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "Special Characters"
+  },
+  "version": "0.1",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    "index.html"
+  ]
+}

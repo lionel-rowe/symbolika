@@ -1,0 +1,92 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+}
+
+body {
+  font-size: 1em;
+  text-align: center;
+  position: relative;
+}
+
+.modal {
+  width: 600px;
+  height: 450px;
+  border-radius: 9px;
+  background: #fff;
+}
+
+/*.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 10000000000;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 40px rgba(0,0,0,0.1), 0 0 10px rgba(0,0,0,0.25);
+}*/
+
+header {
+  padding: 20px 0;
+}
+
+h1 {
+  font-size: 1.2em;
+}
+
+form {
+}
+
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+thead tr {
+  background: green;
+  color: white;
+}
+
+tbody tr:nth-child(even) {
+  background: #dfc;
+}
+
+tr {
+  height: 30px;
+}
+
+input[type=text], input[type=search] {
+  width: 100%;
+  font-size: 2em;
+  text-align: center;
+  border-left: none;
+  border-right: none;
+  padding: 10px 20px;
+  font-family: monospace;
+  /*border: none;
+  /*background: #eee;*/
+}
+
+.trunc {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+
+/*
+.buttons {
+  position: absolute;
+  bottom: 30px;
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+input[type=submit], input[type=button] {
+  padding: 10px 0;
+  width: 5em;
+  font-size: 2em;
+}
+*/
