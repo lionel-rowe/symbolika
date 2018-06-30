@@ -109,7 +109,11 @@ window.addEventListener('keydown', (e) => {
 
       backdrop.addEventListener('click', cleanup);
 
-    } else if (modal && modal.style.display === 'none') {
+    } else if (
+      modal && modal.style.display === 'none'
+      && isEditable(document.activeElement)
+    ) {
+      prevEl = document.activeElement;
       modal.style.display = null;
       backdrop.style.display = null;
       window.addEventListener('keyup', escListener);
