@@ -18,109 +18,189 @@ let loadMsg;
 let prevEl;
 let escListener;
 
+let selection = {type: null};
+
 function cleanup() {
   modal.style.display = 'none';
   backdrop.style.display = 'none';
+
+  prevEl.blur();
   prevEl.focus();
+
+  if (selection.type === 'simple') {
+    prevEl.setSelectionRange(selection.range.selectionStart, selection.range.selectionEnd, selection.range.selectionDirection);
+  } else if (selection.type === 'rangy') {
+
+    console.log(prevEl, selection);
+
+    rangy.restoreSelection(selection.range);
+  }
+
   window.removeEventListener('keyup', escListener);
   // chrome.runtime.onMessage.removeListener(msgListener);
 }
 
+let shouldRefresh = false;
+
+let hiddenInput; //needs this scope to be referred to later
+
+let isInitialDisplay = true;
+
 window.addEventListener('keydown', (e) => {
   if (e.ctrlKey && (e.key === ',')) {
 
-    if (
-      !document.querySelector(`#${modalId}`)
-      && isEditable(document.activeElement)
-    ) {
-      modal = document.createElement('iframe');
-      modal.id = modalId;
-      modal.style = `
-        width: 600px !important;
-        height: 450px !important;
-        position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
-        z-index: ${maxZIdx} !important;
-        transform: translate(-50%, -50%) !important;
-        border-radius: 9px !important;
-        box-shadow: 0 0 40px rgba(0,0,0,0.1), 0 0 10px rgba(0,0,0,0.25) !important;
-        background: #fff !important;
-        box-sizing: border-box !important;
-        border: none !important;
-        filter: blur(0) !important;
-        -webkit-filter: blur(0) !important;
-        display: none !important;
-      `;
+    prevEl = document.activeElement; //before switching focus to hiddenInput
 
-      modal.src = indexSrc;
-
-      modal.onload = () => {
-        modal.style.display = null;
-        loadMsg.remove();
-      }
-
-      backdrop = document.createElement('div');
-      backdrop.id = backdropId;
-      backdrop.style = `
-        position: fixed !important;
-        background: rgba(0,0,0,0.7) !important;
-        z-index: ${maxZIdx} !important;
-        top: 0 !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        box-sizing: border-box !important;
-      `;
-
-      loadMsg = document.createElement('div');
-      loadMsg.textContent = 'Loading…';
-      loadMsg.style = `
-        position: absolute !important;
-        color: white !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        font-size: 18px !important;
-      `;
-
-      backdrop.appendChild(loadMsg);
-
-      prevEl = document.activeElement;
-
-      document.querySelector('body').appendChild(backdrop);
-      document.querySelector('body').appendChild(modal);
-
-      function msgListener(req, sender) {
-        if (sender.id === chrome.runtime.id && typeof req.closeWithChar !== 'undefined') {
-          cleanup();
-          document.execCommand('insertText', null, req.closeWithChar || '');
+    if (['INPUT', 'TEXTAREA'].includes(prevEl.tagName)) {
+      selection = {
+        type: 'simple',
+        range: {
+          selectionStart: prevEl.selectionStart, selectionEnd: prevEl.selectionEnd, selectionDirection: prevEl.selectionDirection
         }
-      }
-
-      function escListener(e) {
-        if (e.key === 'Escape') {
-          cleanup();
-        }
-      }
-
-      window.addEventListener('keyup', escListener);
-      chrome.runtime.onMessage.addListener(msgListener);
-
-      backdrop.addEventListener('click', cleanup);
-
-    } else if (
-      modal && modal.style.display === 'none'
-      && isEditable(document.activeElement)
-    ) {
-      prevEl = document.activeElement;
-      modal.style.display = null;
-      backdrop.style.display = null;
-      window.addEventListener('keyup', escListener);
-
-      chrome.runtime.sendMessage({reinit: true});
-
+      };
+    } else {
+      selection = {
+        type: 'rangy',
+        range: rangy.saveSelection()
+      };
     }
 
+    if (isInitialDisplay) {
+      hiddenInput = document.createElement('input');
+      hiddenInput.type = 'text';
+      hiddenInput.style = 'opacity:0;border:none;position:fixed;'
+      document.body.appendChild(hiddenInput);
+      hiddenInput.focus();
+      isInitialDisplay = false;
+    }
+
+    showModal();
   }
+});
+
+chrome.runtime.onMessage.addListener((req, sender) => {
+  if ((sender.id === chrome.runtime.id) && req.showModal) {
+    showModal();
+  }
+});
+
+const updateMsg = chrome.i18n.getMessage('updateMsg', chrome.i18n.getMessage('extName')); //must be set outside function scope, otherwise `chrome.i18n` will no longer be available
+
+function promptReload() {
+  alert(updateMsg);
+}
+
+function showModal() {
+
+  if (shouldRefresh) {
+    promptReload();
+  } else if (
+    !document.querySelector(`#${modalId}`)
+    && isEditable(document.activeElement)
+  ) {
+    modal = document.createElement('iframe');
+    modal.id = modalId;
+    modal.style = `
+      width: 600px !important;
+      height: 450px !important;
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      z-index: ${maxZIdx} !important;
+      transform: translate(-50%, -50%) !important;
+      border-radius: 9px !important;
+      box-shadow: 0 0 40px rgba(0,0,0,0.1), 0 0 10px rgba(0,0,0,0.25) !important;
+      background: #fff !important;
+      box-sizing: border-box !important;
+      border: none !important;
+      filter: blur(0) !important;
+      -webkit-filter: blur(0) !important;
+      display: none !important;
+    `;
+
+    modal.src = indexSrc;
+
+    modal.onload = () => {
+      modal.style.display = null;
+
+      chrome.runtime.sendMessage({capturedInput: hiddenInput.value});
+
+      loadMsg.remove();
+      hiddenInput.remove();
+    }
+
+    backdrop = document.createElement('div');
+    backdrop.id = backdropId;
+    backdrop.style = `
+      position: fixed !important;
+      background: rgba(0,0,0,0.7) !important;
+      z-index: ${maxZIdx} !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      box-sizing: border-box !important;
+    `;
+
+    loadMsg = document.createElement('div');
+    loadMsg.textContent = 'Loading…';
+    loadMsg.style = `
+      position: absolute !important;
+      color: white !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      font-size: 18px !important;
+    `;
+
+    backdrop.appendChild(loadMsg);
+
+    document.querySelector('body').appendChild(backdrop);
+    document.querySelector('body').appendChild(modal);
+
+    function msgListener(req, sender) {
+      if (sender.id === chrome.runtime.id && typeof req.closeWithChar !== 'undefined') {
+        if (req.closeWithChar) {
+          cleanup();
+          document.execCommand('insertText', null, req.closeWithChar);
+        } else if (/\.slack\.com$/.test(window.location.hostname)) { //hack to get Slack focusing to behave on `Esc`
+          window.setTimeout(() => cleanup(), 100);
+        } else {
+          cleanup();
+        }
+      }
+    }
+
+    function escListener(e) {
+      if (e.key === 'Escape') {
+        cleanup();
+      }
+    }
+
+    window.addEventListener('keyup', escListener);
+    chrome.runtime.onMessage.addListener(msgListener);
+
+    backdrop.addEventListener('click', cleanup);
+
+  } else if (
+    modal && modal.style.display === 'none'
+    && isEditable(document.activeElement)
+  ) {
+    prevEl = document.activeElement;
+
+    modal.style.display = null;
+    backdrop.style.display = null;
+    window.addEventListener('keyup', escListener);
+
+    chrome.runtime.sendMessage({reinit: true});
+
+  }
+}
+
+const port = chrome.runtime.connect(chrome.runtime.id);
+
+port.onDisconnect.addListener(() => {
+  modal && modal.remove();
+  backdrop && backdrop.remove();
+  shouldRefresh = true;
 });

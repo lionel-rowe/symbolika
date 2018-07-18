@@ -1,0 +1,46 @@
+{
+  "extName": {
+    "message": "特殊字符"
+  },
+  "extDesc": {
+    "message": "输入特殊字符。"
+  },
+  "ctxMenu": {
+    "message": "输入特殊字符"
+  },
+
+  "updateMsg": {
+    "message": "插件$extName$已更新。请刷新网页继续使用。",
+    "placeholders": {
+      "extName": {
+        "content": "$1"
+      }
+    }
+  },
+
+
+
+  "modal_title": {
+    "message": "输入特殊字符"
+  },
+  "modal_searchBox_placeholder": {
+    "message": "搜索"
+  },
+
+  "modal_resultsTable_col_number": {
+    "message": "序号"
+  },
+  "modal_resultsTable_col_name": {
+    "message": "名称"
+  },
+  "modal_resultsTable_col_codepoint": {
+    "message": "编码点"
+  },
+  "modal_resultsTable_col_char": {
+    "message": "字符"
+  },
+  "modal_resultsTable_msg_noResults": {
+    "message": "暂无结果"
+  }
+
+}

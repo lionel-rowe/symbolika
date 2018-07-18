@@ -1,18 +1,27 @@
 {
-  "short_name": "Special Characters",
-  "name": "Special Characters",
+  "name": "__MSG_extName__",
+  "short_name": "__MSG_extName__",
+  "author": "lionel.rowe@gmail.com",
+  "description": "__MSG_extDesc__",
+  "default_locale": "en",
   "manifest_version": 2,
   "browser_action": {
-    "default_popup": "popup.html",
-    "default_title": "Special Characters"
+    "default_title": "__MSG_extName__"
   },
+  "permissions": [
+    "contextMenus"
+  ],
   "version": "0.1",
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["rangy-core.js", "rangy-selectionsaverestore.js", "content.js"]
     }
   ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
   "web_accessible_resources": [
     "index.html"
   ]

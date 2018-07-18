@@ -3,42 +3,32 @@
 import React, { Component } from 'react';
 import './App.css';
 import config from './config.js';
-// import Fuse from "fuse.js"
-import entities from './data/html_entities.js';
-import emoji from './data/emoji.js';
-import unicode from './data/unicode_chars.js';
-import aliases from './data/aliases.js';
 
-const mod = (n, m) => ((n % m) + m) % m;
+const mod = (n1, n2) => ((n1 % n2) + n2) % n2;
 
 const maxSearchLength = 32;
 const resultsToDisplay = 9;
 
+let msgs = {};
+
+const i14e = (key) => {
+  if (chrome.i18n) { //production
+    return chrome.i18n.getMessage(key);
+  } else { //dev
+    return (msgs[key] && msgs[key].message);
+  }
+}
+
+let chars = [];
+
 const contentOnly = str => str.replace(/[^a-zA-Z0-9+]|\b(?:and|with)\b/g, '');
 
-const chars = entities.map(el => ({char: el.char, name: el.name, type: 'html'}))
-.concat(emoji.map(el => ({char: el.char, name: el.name, type: 'emoji'})))
-.concat(unicode.map(el => ({char: el.char, name: el.name.toLowerCase(), type: 'unicode'})))
-.concat(aliases.map(el => ({char: el.char, name: el.name, type: 'alias'})));
-
-// const options = {
-//   keys: ['name'],
-//   caseSensitive: false,
-//   shouldSort: false,
-//   includeScore: true,
-//   // tokenize: true,
-//   location: 0,
-//   threshold: 0,
-//   maxPatternLength: maxSearchLength,
-//   distance: 100
-// };
-
-// const fuse = new Fuse(chars, options);
+let initialInput = '';
 
 class App extends Component {
 
   initVals = {
-    input: '',
+    input: initialInput,
     choices: [],
     fauxcused: -1,
     listenForKeyup: false
@@ -89,6 +79,31 @@ class App extends Component {
   }
 
   componentDidMount() {
+
+    chrome.runtime && chrome.runtime.onMessage && chrome.runtime.onMessage.addListener((req, sender) => {
+      if (sender.id === chrome.runtime.id && req.capturedInput) {
+        initialInput = req.capturedInput;
+        this.setState({input: req.capturedInput});
+      }
+    });
+
+    if (!chrome.i18n) {
+      fetch('./_locales/en/messages.json', //public
+        {cache: 'no-store'}
+      ).then(dat => dat.json())
+      .then(json => {
+        msgs = json;
+        this.forceUpdate();
+      });
+    }
+
+    fetch('./_locales/en/chars.json', //public
+      {cache: 'no-store'}
+    ).then(dat => dat.json())
+    .then(json => {
+      chars = json;
+    });
+
     document.addEventListener('keydown', e => {
 
       const idx = parseInt(e.key, 10) - 1;
@@ -124,14 +139,14 @@ class App extends Component {
         }
       }
 
-      function reinitListener(req, sender, thisArg) {
-        if (sender.id === chrome.runtime.id && req.reinit) {
+      function msgListener(req, sender, thisArg) {
+        if (sender.id === chrome.runtime.id && req.reinit) { // reinit
           thisArg.initState();
           document.querySelector('#searchbox').focus();
         }
       }
 
-      chrome.runtime && chrome.runtime.onMessage && chrome.runtime.onMessage.addListener((req, sender) => reinitListener(req, sender, this));
+      chrome.runtime && chrome.runtime.onMessage && chrome.runtime.onMessage.addListener((req, sender) => msgListener(req, sender, this));
 
     });
 
@@ -141,12 +156,11 @@ class App extends Component {
 
   render() {
 
-
     return (
       <div className='modal'>
         <header>
           <h1>
-            <span role='img' aria-label=''>🔣</span> Insert Special Character
+            <span role='img' aria-label=''>🔣</span> {i14e('modal_title')}
           </h1>
         </header>
         <form
@@ -156,7 +170,7 @@ class App extends Component {
         >
           <input
             type='search'
-            placeholder='Search'
+            placeholder={i14e('modal_searchBox_placeholder')}
             autoComplete='off'
             id='searchbox'
             value={this.state.input}
@@ -164,11 +178,6 @@ class App extends Component {
               const input = e.target.value;
 
               this.setState({fauxcused: -1});
-
-              // const matchList = fuse.search(e.target.value)
-              //   .map(el => {
-              //     return {name: el.item.name, char: el.item.char, type: el.item.type, codepoint: el.item.char.codePointAt(), score: el.score};
-              //   });
 
               if (!input) {
                 this.setState({input: '', choices: []});
@@ -180,11 +189,24 @@ class App extends Component {
               const matchList = chars.filter(el => {
                 return contentOnly(el.name.toLowerCase())
                   .includes(contentOnly(e.target.value.toLowerCase()));
-              }).map(el => {
+              });
+
+              const matchedCodepoint = chars.filter(el => {
+                const trimmed = e.target.value.trim();
+                if (/^[0-9a-f]+$/i.test(trimmed)
+                  && el.char.codePointAt() === parseInt(trimmed, 16)) {
+                  return el;
+                }
+              })[0];
+
+              if (matchedCodepoint) { //TODO: fix (add after sorting)
+                matchList.unshift(matchedCodepoint);
+              }
+
+              matchList.forEach(el => {
                 el.codepoint = el.char.codePointAt();
                 // el.score = el.name.indexOf(e.target.value);
                 el.score = 0;
-                return el;
               });
 
               const choices = matchList.sort((a, b) => {
@@ -219,15 +241,15 @@ class App extends Component {
           (<table>
             <thead>
               <tr>
-                <th style={{width: '4em'}}>№</th>
-                <th style={{width: '18em'}}>Name</th>
-                <th>Codepoint</th>
-                <th>Character</th>
+                <th style={{width: '4em'}}>{i14e('modal_resultsTable_col_number')}</th>
+                <th style={{width: '18em'}}>{i14e('modal_resultsTable_col_name')}</th>
+                <th>{i14e('modal_resultsTable_col_codepoint')}</th>
+                <th>{i14e('modal_resultsTable_col_char')}</th>
               </tr>
             </thead>
             <tbody>{!this.state.choices.length
               ? (<tr>
-                <td colSpan={4}>No results found</td>
+                <td colSpan={4}>{i14e('modal_resultsTable_msg_noResults')}</td>
               </tr>)
               : this.state.choices
               .map((el, idx) => {
@@ -264,4 +286,6 @@ class App extends Component {
   }
 }
 
+
 export default App;
+

@@ -1,7 +1,7 @@
 export default {
   shortcut: {
-    modifiers: ['altKey'], //all required
-    keyChoices: ['`'] //any one required
+    modifiers: ['ctrlKey'], //all required
+    keyChoices: [','] //any one required
   },
   useModKeyForLiterals: false
 };

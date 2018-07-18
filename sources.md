@@ -1,7 +1,12 @@
-https://github.com/unicode-table/unicode-table-data
-https://gist.github.com/rxaviers/7360908
-https://dev.w3.org/html5/html-author/charref
+# SOURCES
 
+* [Unicode](https://github.com/unicode-table/unicode-table-data) (replace old with this; note includes combined forms)
+* [Emoji](https://api.github.com/emojis) (replace [old](https://gist.github.com/rxaviers/7360908) with this)
+* [HTML entities](https://dev.w3.org/html5/html-author/charref)
+* [Combined emoji](http://unicode.org/emoji/charts/emoji-zwj-sequences.html)
+* [CLDR](https://unicode.org/cldr/charts/dev/annotations/index.html)?
+  - http://cldr.unicode.org/index ?
+  - https://github.com/unicode-cldr/cldr-json#cldr-json ?
 
 ```
 { //https://dev.w3.org/html5/html-author/charref

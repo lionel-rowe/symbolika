@@ -1,0 +1,44 @@
+{
+  "extName": {
+    "message": "Special Characters"
+  },
+  "extDesc": {
+    "message": "Insert special characters."
+  },
+  "ctxMenu": {
+    "message": "Insert special character"
+  },
+  "updateMsg": {
+    "message": "The $extName$ extension has been updated. Please refresh the page to continue using it.",
+    "placeholders": {
+      "extName": {
+        "content": "$1"
+      }
+    }
+  },
+
+  "modal_title": {
+    "message": "Insert Special Character"
+  },
+  "modal_searchBox_placeholder": {
+    "message": "Search"
+  },
+
+  "modal_resultsTable_col_number": {
+    "message": "№"
+  },
+  "modal_resultsTable_col_name": {
+    "message": "Name"
+  },
+  "modal_resultsTable_col_codepoint": {
+    "message": "Codepoint"
+  },
+  "modal_resultsTable_col_char": {
+    "message": "Character"
+  },
+
+  "modal_resultsTable_msg_noResults": {
+    "message": "No results found."
+  }
+
+}
