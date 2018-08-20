@@ -3,5 +3,6 @@ export default {
     modifiers: ['ctrlKey'], //all required
     keyChoices: [','] //any one required
   },
-  useModKeyForLiterals: false
+  useModKeyForLiterals: false,
+  resultsToDisplay: 9
 };

@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "Special Characters"
+    "message": "Symbolika"
   },
   "extDesc": {
     "message": "Insert special characters."
@@ -16,14 +16,12 @@
       }
     }
   },
-
   "modal_title": {
     "message": "Insert Special Character"
   },
   "modal_searchBox_placeholder": {
     "message": "Search"
   },
-
   "modal_resultsTable_col_number": {
     "message": "№"
   },
@@ -31,14 +29,15 @@
     "message": "Name"
   },
   "modal_resultsTable_col_codepoint": {
-    "message": "Codepoint"
+    "message": "Codepoints"
   },
   "modal_resultsTable_col_char": {
     "message": "Character"
   },
-
   "modal_resultsTable_msg_noResults": {
     "message": "No results found."
+  },
+  "modal_resultsTable_msg_loadingData": {
+    "message": "Loading data..."
   }
-
 }

@@ -63,6 +63,9 @@ window.addEventListener('keydown', (e) => {
         type: 'rangy',
         range: rangy.saveSelection()
       };
+
+      document.querySelector('.rangySelectionBoundary').style = null;
+
     }
 
     if (isInitialDisplay) {
@@ -100,22 +103,39 @@ function showModal() {
   ) {
     modal = document.createElement('iframe');
     modal.id = modalId;
+    // modal.style = `
+    //   width: 620px !important;
+    //   min-height: 500px !important;
+    //   position: fixed !important;
+    //   top: 50% !important;
+    //   left: 50% !important;
+    //   z-index: ${maxZIdx} !important;
+    //   transform: translate(-50%, -50%) !important;
+    //   border-radius: 9px !important;
+    //   box-shadow: 0 0 40px rgba(0,0,0,0.1), 0 0 10px rgba(0,0,0,0.25) !important;
+    //   background: #fff !important;
+    //   box-sizing: border-box !important;
+    //   border: none !important;
+    //   filter: blur(0) !important;
+    //   -webkit-filter: blur(0) !important;
+    //   display: none !important;
+    // `;
+
     modal.style = `
-      width: 600px !important;
-      height: 450px !important;
+      width: 100vw !important;
+      height: 100vh !important;
       position: fixed !important;
-      top: 50% !important;
-      left: 50% !important;
       z-index: ${maxZIdx} !important;
-      transform: translate(-50%, -50%) !important;
-      border-radius: 9px !important;
-      box-shadow: 0 0 40px rgba(0,0,0,0.1), 0 0 10px rgba(0,0,0,0.25) !important;
-      background: #fff !important;
+      background: transparent !important;
       box-sizing: border-box !important;
       border: none !important;
       filter: blur(0) !important;
       -webkit-filter: blur(0) !important;
       display: none !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
     `;
 
     modal.src = indexSrc;
@@ -128,6 +148,20 @@ function showModal() {
       loadMsg.remove();
       hiddenInput.remove();
     }
+
+    /* results in significantly _worse_ UX - don't use */
+    // chrome.runtime.onMessage.addListener((req, sender) => {
+
+    //   if (sender.id === chrome.runtime.id && req.ready) {
+
+    //     modal.style.display = null;
+
+    //     chrome.runtime.sendMessage({capturedInput: hiddenInput.value});
+
+    //     loadMsg.remove();
+    //     hiddenInput.remove();
+    //   }
+    // });
 
     backdrop = document.createElement('div');
     backdrop.id = backdropId;
@@ -158,29 +192,43 @@ function showModal() {
     document.querySelector('body').appendChild(backdrop);
     document.querySelector('body').appendChild(modal);
 
+    function setTimeoutIfSlack(fn, timeoutLengthMs) {
+      if (/\.slack\.com$/.test(window.location.hostname)) { //hack to get Slack to behave correctly on various actions
+        window.setTimeout(() => fn(), timeoutLengthMs);
+      } else {
+        fn();
+      }
+    }
+
     function msgListener(req, sender) {
       if (sender.id === chrome.runtime.id && typeof req.closeWithChar !== 'undefined') {
         if (req.closeWithChar) {
           cleanup();
-          document.execCommand('insertText', null, req.closeWithChar);
-        } else if (/\.slack\.com$/.test(window.location.hostname)) { //hack to get Slack focusing to behave on `Esc`
-          window.setTimeout(() => cleanup(), 100);
+
+          setTimeoutIfSlack(() => {
+            document.execCommand('insertText', null, req.closeWithChar);
+          }, 0); // must be forced to async, otherwise insertion position
+          // is not correct at end of multiline input
+
         } else {
-          cleanup();
+          setTimeoutIfSlack(cleanup, 100); // yes, seriously...
+          // cleanup must be within timeout if char is to be inserted, and outside
+          // of it if no char to be inserted. this is due to default Slack behavior
+          // on `Esc` key, which resets cursor position to start of input box.
         }
       }
     }
 
     function escListener(e) {
       if (e.key === 'Escape') {
-        cleanup();
+        setTimeoutIfSlack(cleanup, 100);
       }
     }
 
     window.addEventListener('keyup', escListener);
     chrome.runtime.onMessage.addListener(msgListener);
 
-    backdrop.addEventListener('click', cleanup);
+    backdrop.addEventListener('click', cleanup); //TODO: fix (broken now that `modal` takes up whole screen)
 
   } else if (
     modal && modal.style.display === 'none'

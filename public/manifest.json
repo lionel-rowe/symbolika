@@ -5,24 +5,44 @@
   "description": "__MSG_extDesc__",
   "default_locale": "en",
   "manifest_version": 2,
-  "browser_action": {
-    "default_title": "__MSG_extName__"
-  },
   "permissions": [
     "contextMenus"
   ],
   "version": "0.1",
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["rangy-core.js", "rangy-selectionsaverestore.js", "content.js"]
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "rangy-core.js",
+        "rangy-selectionsaverestore.js",
+        "content.js"
+      ]
     }
   ],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": [
+      "background.js"
+    ],
     "persistent": false
   },
   "web_accessible_resources": [
     "index.html"
-  ]
+  ],
+  "icons": {
+    "16": "favicons/symbolika_logo_16.png",
+    "32": "favicons/symbolika_logo_32.png",
+    "64": "favicons/symbolika_logo_64.png",
+    "128": "favicons/symbolika_logo_128.png"
+  },
+  "page_action": {
+    "default_icon": {
+      "16": "favicons/symbolika_logo_16.png",
+      "32": "favicons/symbolika_logo_32.png",
+      "64": "favicons/symbolika_logo_64.png",
+      "128": "favicons/symbolika_logo_128.png"
+    },
+    "default_title": "__MSG_extName__"
+  }
 }

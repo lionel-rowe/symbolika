@@ -1,4 +1,11 @@
-chrome.runtime.onConnect.addListener(port => console.log('Connected:', port)); //accept connection
+chrome.runtime.onConnect.addListener(port => {
+  console.log('Connected:', port);
+
+  chrome.pageAction.show(port.sender.tab.id);
+
+  port.onDisconnect = () => chrome.pageAction.hide(port.sender.tab.id);
+
+}); //accept connection
 
 chrome.contextMenus.create({
   id: "openModal",
