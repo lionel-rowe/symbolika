@@ -1,3 +1,4 @@
+
 chrome.runtime.onConnect.addListener(port => {
   console.log('Connected:', port);
 
@@ -17,3 +18,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   console.log(info, tab);
   chrome.tabs.sendMessage(tab.id, {showModal: true});
 });
+
+
+
+//===================//
+
+const worker = new SharedWorker('worker.js');
+
+worker.port.start();

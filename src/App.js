@@ -7,17 +7,13 @@ import math from './math.js';
 import Logo from './Logo.js';
 import CloseButton from './CloseButton.js';
 import Pagination from './Pagination.js';
-import elasticlunr from 'elasticlunr';
+// import elasticlunr from 'elasticlunr';
 import twemoji from 'twemoji';
-
-
-// const mod = (n1, n2) => ((n1 % n2) + n2) % n2;
-
-elasticlunr.clearStopWords();
 
 const maxSearchLength = 32;
 
 let msgs = {};
+let worker = {};
 
 const i14e = (key) => {
   if (chrome.i18n) { //production
@@ -28,7 +24,7 @@ const i14e = (key) => {
 }
 
 let chars = [];
-let elunrIndex = elasticlunr(() => null);
+// let elunrIndex = elasticlunr(() => null);
 
 class App extends React.Component {
 
@@ -76,127 +72,34 @@ class App extends React.Component {
     }
   }
 
-  updateChoices() {
+  updateChoices(choices) {
 
-    const input = this.state.input;
+    console.log(choices);
 
     this.setState({
-      rowIdx: 0
+      elunrLoaded: true,
+      rowIdx: 0,
+      choices: choices
     });
 
-    if (!input) {
-      this.setState({input: '', choices: []});
-      return;
-    }
-
-    const trimmed = input.trim();
-
-    const searchTypes = [
-      //tested in order - more specific must come first
-      //first capture group of pattern is the content
-      {pattern: /^&#x([0-9a-f]{1,6});$/i, type: 'codePointHex'},
-      {pattern: /^&#([0-9]{1,7});$/i, type: 'codePointDec'},
-      {pattern: /^&([0-9a-z]+);$/i, type: 'html'},
-      {pattern: /^\\u{([0-9a-f]{1,6})}$/i, type: 'codePointHex'},
-      {pattern: /^\\u([0-9a-f]{4})$/i, type: 'codePointHex'},
-      {pattern: /^u\+([0-9a-f]{4,6})$/i, type: 'codePointHex'},
-      {pattern: /^0x([0-9a-f]{1,6})$/i, type: 'codePointHex'},
-      {pattern: /^:([\s\S]+):?$/, type: 'emoji'},
-      {pattern: /^([\s\S]+)$/, type: 'bare'}, //catchall
-      {pattern: /^$/, type: 'empty'} //catchall
-    ];
-
-    let searchItem;
-
-    for (let i = 0; i < searchTypes.length; i++) {
-
-      const m = trimmed.match(searchTypes[i].pattern);
-
-      if (m) {
-        searchItem = {
-          content: m[1] || '',
-          type: searchTypes[i].type
-        };
-        break;
-      }
-
-    }
-
-    let choices = [];
-    const seenLookup = Object.create(null);
-
-    if (searchItem.type === 'codePointHex' || searchItem.type === 'codePointDec') {
-
-      const cp = parseInt(searchItem.content, searchItem.type === 'codePointHex' ? 16 : 10);
-
-      const eligibles = chars.filter(char => Array.from(char.char).length === 1);
-      const cps = eligibles.map(char => char.char.codePointAt());
-
-      const match = eligibles[cps.indexOf(cp)];
-
-      choices = match ? [match] : [];
-
-    } else {
-
-      const typeFilterCond = ['html', 'emoji'].includes(searchItem.type)
-        ? el => el.type === searchItem.type
-        : el => true;
-
-      const shouldExpand = searchItem.content.split(/\W+/).filter(word => word && word.length <= 2).length <= 1; //without this condition, searching for multiple 1- or 2-letter words yields very poor performance 
-
-      const matchedRefs = elunrIndex.search(searchItem.content, {bool: 'AND', expand: shouldExpand});
-
-      const matchList = matchedRefs.map(el => {
-        // return {
-        //   ref: el.ref,
-        //   score: el.score,
-        //   char: chars[el.ref].char,
-        //   name: chars[el.ref].name,
-        //   type: chars[el.ref].type
-        // };
-        return chars[el.ref];
+    if (chrome.tabs) { //production
+      chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, {ready: true});
       });
+    } 
 
-      // console.log(matchList);
-
-      choices = matchList
-      .filter(el => typeFilterCond(el))
-      // .sort((a, b) => {
-
-      //   const aPerfect = a.name === input;
-      //   const bPerfect = b.name === input;
-
-      //   const aPerfectPartial = a.name.slice(0, input.length) === input;
-      //   const bPerfectPartial = b.name.slice(0, input.length) === input;
-
-      //   // const aContentOnly = contentOnly(a.name).slice(0, inputContentOnly.length) === inputContentOnly;
-      //   // const bContentOnly = contentOnly(b.name).slice(0, inputContentOnly.length) === inputContentOnly;
-
-      //   return (+isCodepointMatch(b) - +isCodepointMatch(a))
-      //     || (bPerfect - aPerfect)
-      //     || (bPerfectPartial - aPerfectPartial)
-      //     // || (bContentOnly - aContentOnly)
-      //     // || (a.score - b.score)
-      //     || (a.name.length - b.name.length);
-      // })
-      .filter(el => {
-        return !seenLookup[el.char] && (seenLookup[el.char] = true);
-      }); //filters non-unique chars
-      // .sort((a, b) => {
-      //   // return b.score - a.score
-      //   // || a.char.charCodeAt() - b.char.charCodeAt()
-      // });
-
-    }
-
-    this.setState({
-      input,
-      choices
-    });
 
   }
 
   componentDidMount() {
+
+    worker = new SharedWorker('worker.js');
+
+    worker.port.postMessage({input: this.state.input});
+
+    worker.port.onmessage = e => {
+      this.updateChoices(e.data.choices);
+    }
 
     chrome.runtime && chrome.runtime.onMessage && chrome.runtime.onMessage.addListener((req, sender) => {
       if (sender.id === chrome.runtime.id && req.capturedInput) {
@@ -214,46 +117,6 @@ class App extends React.Component {
         this.forceUpdate();
       });
     }
-
-    const urls = ['./elunrIndex.json', './_locales/en/chars.json']; //public
-
-    //TODO: swap out chars for elunrIndex.documentStore.docs - redundant (?)
-
-    const ts0 = new Date().valueOf();
-    let tsPostFetch;
-
-    Promise.all(urls.map(url => {
-
-      return fetch(url, {cache: 'no-store'}).then(dat => {
-
-        tsPostFetch = new Date().valueOf();
-
-        return dat.json();
-      });
-    })).then(jsons => {
-
-      const tsPostJsonParse = new Date().valueOf();
-
-      elunrIndex = elasticlunr.Index.load(jsons[0]);
-
-      chars = jsons[1];
-
-      this.setState({elunrLoaded: true});
-      this.updateChoices();
-      // this.forceUpdate();
-
-      const tsPostIndexParse = new Date().valueOf();
-
-      console.log(`fetch: ${tsPostFetch - ts0}ms; JSON parse: ${tsPostJsonParse - tsPostFetch}ms; index parse: ${tsPostIndexParse - tsPostJsonParse}ms`);
-
-      if (chrome.tabs) { //production
-        chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-          chrome.tabs.sendMessage(tabs[0].id, {ready: true});
-        });
-      } 
-
-
-    });
 
     document.addEventListener('keydown', e => { //applies only to document within
 
@@ -342,10 +205,11 @@ class App extends React.Component {
             id='searchbox'
             value={this.state.input}
             onChange={e => {
+              const input = e.target.value;
 
-              this.setState({input: e.target.value}, () => {
-                if (this.state.elunrLoaded) this.updateChoices();
-              });
+              this.setState({input/*, elunrLoaded: false*/});
+
+              worker.port.postMessage({input});
 
             }}
             maxLength={maxSearchLength}
