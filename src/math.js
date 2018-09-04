@@ -37,7 +37,7 @@ const getFauxcus = rowIdx => {
 }
 
 export default {
-  // mod,
+  mod,
   getPageNumber,
   getTotalPages,
   incrementRowIdx,

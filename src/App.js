@@ -7,8 +7,8 @@ import math from './math.js';
 import Logo from './Logo.js';
 import CloseButton from './CloseButton.js';
 import Pagination from './Pagination.js';
-// import elasticlunr from 'elasticlunr';
 import twemoji from 'twemoji';
+import tabToNext from './tabToNext.js';
 
 const maxSearchLength = 32;
 
@@ -22,9 +22,6 @@ const i14e = (key) => {
     return (msgs[key] && msgs[key].message);
   }
 }
-
-let chars = [];
-// let elunrIndex = elasticlunr(() => null);
 
 class App extends React.Component {
 
@@ -74,8 +71,6 @@ class App extends React.Component {
 
   updateChoices(choices) {
 
-    console.log(choices);
-
     this.setState({
       elunrLoaded: true,
       rowIdx: 0,
@@ -86,8 +81,7 @@ class App extends React.Component {
       chrome.tabs.query({active: true, currentWindow: true}, tabs => {
         chrome.tabs.sendMessage(tabs[0].id, {ready: true});
       });
-    } 
-
+    }
 
   }
 
@@ -98,7 +92,9 @@ class App extends React.Component {
     worker.port.postMessage({input: this.state.input});
 
     worker.port.onmessage = e => {
-      this.updateChoices(e.data.choices);
+      if (this.state.input === e.data.input) { //prevent change if input has been updated again since message posted
+        this.updateChoices(e.data.choices);
+      }
     }
 
     chrome.runtime && chrome.runtime.onMessage && chrome.runtime.onMessage.addListener((req, sender) => {
@@ -118,7 +114,15 @@ class App extends React.Component {
       });
     }
 
-    document.addEventListener('keydown', e => { //applies only to document within
+    document.addEventListener('click', e => {
+      if (e.target.nodeName === 'HTML' //target is backdrop 
+        && !this.state.input //avoid deleting user work
+      ) {
+        this.closeWithChar(null);
+      }
+    });
+
+    document.addEventListener('keydown', e => {
 
       const idx = parseInt(e.key, 10) - 1;
 
@@ -167,6 +171,9 @@ class App extends React.Component {
         } else {
           this.closeWithChar(null);
         }
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        tabToNext(e);
       }
 
       function msgListener(req, sender, thisArg) {

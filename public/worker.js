@@ -34,8 +34,6 @@ onconnect = e => {
 
   port.addEventListener('message', e => {
 
-    console.log(e);
-
     const input = e.data.input;
 
     if (!input) {

@@ -30,9 +30,6 @@ function cleanup() {
   if (selection.type === 'simple') {
     prevEl.setSelectionRange(selection.range.selectionStart, selection.range.selectionEnd, selection.range.selectionDirection);
   } else if (selection.type === 'rangy') {
-
-    console.log(prevEl, selection);
-
     rangy.restoreSelection(selection.range);
   }
 
