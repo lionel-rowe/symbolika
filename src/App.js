@@ -249,6 +249,14 @@ class App extends React.Component {
                   && idx < math.getMaxDisplayedIdx(this.state.rowIdx)
               })
               .map((el, idx) => {
+
+                const codePoints = Array.from(el.char).map(char => {
+                  return `U+${char.codePointAt()
+                .toString(16)
+                .toUpperCase()
+                .padStart(4, '0')}`
+                }).join(', ');
+
                 return (<tr
                   key={idx}
 
@@ -264,15 +272,8 @@ class App extends React.Component {
                 >
                   <td>{idx + 1}</td>
                   <td className='trunc' title={el.name /*`${el.name} (${el.type})`*/}><span>{el.name}</span></td>
-                  <td className='trunc'>
-                    {
-                      Array.from(el.char).map(char => {
-                        return `U+${char.codePointAt() //TODO: show if multiple codepoints
-                      .toString(16)
-                      .toUpperCase()
-                      .padStart(4, '0')}`
-                      }).join(', ')
-                    }
+                  <td className='trunc' title={codePoints}>
+                    {codePoints}
                   </td>
                   <td dangerouslySetInnerHTML={{__html: 
                     twemoji.parse(el.char, {
