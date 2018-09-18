@@ -17,7 +17,7 @@
     }
   },
   "modal_title": {
-    "message": "Insert Special Character"
+    "message": "Symbolika"
   },
   "modal_searchBox_placeholder": {
     "message": "Search"
@@ -38,6 +38,6 @@
     "message": "No results found."
   },
   "modal_resultsTable_msg_loadingData": {
-    "message": "Loading data..."
+    "message": "Loading data…"
   }
 }
