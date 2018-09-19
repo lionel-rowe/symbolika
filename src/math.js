@@ -10,15 +10,15 @@ const getTotalPages = totalRows => Math.ceil(totalRows / resultsToDisplay);
 
 const incrementRowIdx = (rowIdx, totalRows) => mod(rowIdx + 1, totalRows);
 const decrementRowIdx = (rowIdx, totalRows) => mod(rowIdx - 1, totalRows);
-const incrementPageNumber = (rowIdx, totalRows) => {
+const incrementPageNumber = (rowIdx, totalRows, offset) => {
   const pageNumber = getPageNumber(rowIdx);
   const totalPages = getTotalPages(totalRows);
-  return (mod(pageNumber + 1, totalPages)) * resultsToDisplay;
+  return Math.min((mod(pageNumber + 1, totalPages)) * resultsToDisplay + offset, totalRows - 1);
 };
-const decrementPageNumber = (rowIdx, totalRows) => {
+const decrementPageNumber = (rowIdx, totalRows, offset) => {
   const pageNumber = getPageNumber(rowIdx);
   const totalPages = getTotalPages(totalRows);
-  return (mod(pageNumber - 1, totalPages)) * resultsToDisplay;
+  return Math.min((mod(pageNumber - 1, totalPages)) * resultsToDisplay + offset, totalRows - 1);
 };
 
 const getMinDisplayedIdx = rowIdx => getPageNumber(rowIdx) * resultsToDisplay;

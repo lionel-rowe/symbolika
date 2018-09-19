@@ -29,6 +29,7 @@ class App extends React.Component {
     input: '',
     choices: [],
     rowIdx: 0, //previously: -1
+    hoverOffset: 0,
     listenForKeyup: false,
     // elunrLoaded: false //NOTE: should not be in here due to reinit
   };
@@ -73,7 +74,7 @@ class App extends React.Component {
 
     this.setState({
       elunrLoaded: true,
-      rowIdx: 0,
+      rowIdx: this.state.hoverOffset,
       choices: choices
     });
 
@@ -122,6 +123,22 @@ class App extends React.Component {
       }
     });
 
+    document.addEventListener('wheel', e => {
+      const rowIdx = this.state.rowIdx;
+      const totalRows = this.state.choices.length;
+      const offset = this.state.hoverOffset;
+
+      if (e.deltaY < 0) { //upward
+        e.preventDefault();
+        this.setState({rowIdx: math.decrementPageNumber(rowIdx, totalRows, offset)});
+      } else if (e.deltaY > 0) { //downward
+        e.preventDefault();
+        this.setState({rowIdx: math.incrementPageNumber(rowIdx, totalRows, offset)});
+      } else { //catch-all
+        e.preventDefault();
+      }
+    });
+
     document.addEventListener('keydown', e => {
 
       const idx = parseInt(e.key, 10) - 1;
@@ -131,19 +148,26 @@ class App extends React.Component {
 
         const rowIdx = this.state.rowIdx;
         const totalRows = this.state.choices.length;
+        const offset = this.state.hoverOffset;
 
         if (e.key === 'ArrowDown') {
           e.preventDefault();
-          this.setState({rowIdx: math.incrementRowIdx(rowIdx, totalRows)});
+          this.setState({
+            rowIdx: math.incrementRowIdx(rowIdx, totalRows),
+            hoverOffset: math.getFauxcus(this.state.hoverOffset + 1)
+          });
         } else if (e.key === 'ArrowUp') {
           e.preventDefault();
-          this.setState({rowIdx: math.decrementRowIdx(rowIdx, totalRows)});
+          this.setState({
+            rowIdx: math.decrementRowIdx(rowIdx, totalRows),
+            hoverOffset: math.getFauxcus(this.state.hoverOffset - 1)
+          });
         } else if (e.key === 'PageDown') {
           e.preventDefault();
-          this.setState({rowIdx: math.incrementPageNumber(rowIdx, totalRows)});
+          this.setState({rowIdx: math.incrementPageNumber(rowIdx, totalRows, offset)});
         } else if (e.key === 'PageUp') {
           e.preventDefault();
-          this.setState({rowIdx: math.decrementPageNumber(rowIdx, totalRows)});
+          this.setState({rowIdx: math.decrementPageNumber(rowIdx, totalRows, offset)});
         }
 
       } else if (!isNaN(idx) && !e.altKey) { //is a num key (ignore w alt)
@@ -216,6 +240,8 @@ class App extends React.Component {
 
               this.setState({input/*, elunrLoaded: false*/});
 
+              setTimeout(() => console.log(this.state), 100);
+
               worker.port.postMessage({input});
 
             }}
@@ -260,7 +286,12 @@ class App extends React.Component {
                 return (<tr
                   key={idx}
 
-                  onMouseEnter={() => this.setState({rowIdx: math.getMinDisplayedIdx(this.state.rowIdx) + idx})}
+                  onMouseEnter={() => {
+                    this.setState({
+                      rowIdx: math.getMinDisplayedIdx(this.state.rowIdx) + idx,
+                      hoverOffset: idx
+                    }/*, () => console.log(this.state)*/);
+                  }}
 
                   // onFocus={() => this.setState({rowIdx: idx})}
                   // onBlur={() => this.setState({rowIdx: idx})}
