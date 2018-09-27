@@ -124,6 +124,9 @@ class App extends React.Component {
     });
 
     document.addEventListener('wheel', e => {
+
+      if (['ctrlKey', 'shiftKey', 'altKey', 'metaKey'].some(key=> e[key])) return; //must not have modifier keys pressed (don't want to limit other scroll-wheel functionality, such as zooming)
+
       const rowIdx = this.state.rowIdx;
       const totalRows = this.state.choices.length;
       const offset = this.state.hoverOffset;
@@ -240,8 +243,6 @@ class App extends React.Component {
 
               this.setState({input/*, elunrLoaded: false*/});
 
-              setTimeout(() => console.log(this.state), 100);
-
               worker.port.postMessage({input});
 
             }}
@@ -290,11 +291,8 @@ class App extends React.Component {
                     this.setState({
                       rowIdx: math.getMinDisplayedIdx(this.state.rowIdx) + idx,
                       hoverOffset: idx
-                    }/*, () => console.log(this.state)*/);
+                    });
                   }}
-
-                  // onFocus={() => this.setState({rowIdx: idx})}
-                  // onBlur={() => this.setState({rowIdx: idx})}
 
                   onClick={() => this.closeWithChar(this.state.choices[this.state.rowIdx].char)}
 
@@ -327,8 +325,8 @@ class App extends React.Component {
               totalPages={math.getTotalPages(this.state.choices.length)}
               changePage={(n) => this.setState({
                 rowIdx: n === +1
-                  ? math.incrementPageNumber(this.state.rowIdx, this.state.choices.length)
-                  : math.decrementPageNumber(this.state.rowIdx, this.state.choices.length)
+                  ? math.incrementPageNumber(this.state.rowIdx, this.state.choices.length, this.state.hoverOffset)
+                  : math.decrementPageNumber(this.state.rowIdx, this.state.choices.length, this.state.hoverOffset)
               })}
             />
           : ''

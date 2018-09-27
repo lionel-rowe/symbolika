@@ -25,7 +25,7 @@ const chars = entities.map(el => {
     return el.name !== '<Not a Character>';
   })
 ).concat(emojis.map(el => {
-    if (el.char.codePointAt() === 128405) el.name = 'middle finger'; //prevent accidentally getting obscene emoji when typing the innocent substring "fu..."
+    if (el.char.codePointAt() === 0x1f595) el.name = 'middle finger'; //prevent accidentally getting obscene emoji when typing the innocent substring "fu..."
     return {char: el.char, name: el.name, type: 'emoji'};
   })
 ).concat(aliases.map(el => {

@@ -5,9 +5,9 @@ chrome.runtime.onConnect.addListener(port => {
 }); //accept connection
 
 chrome.contextMenus.create({
-  id: "openModal",
+  id: 'openModal_' + chrome.runtime.id,
   title: chrome.i18n.getMessage('ctxMenu'),
-  contexts: ["editable"]
+  contexts: ['editable']
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
