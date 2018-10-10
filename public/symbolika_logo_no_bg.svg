@@ -17,7 +17,7 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="symbolika_logo_no_bg.svg">
+   sodipodi:docname="symbolika_logo_no_bg_2.svg">
   <defs
      id="defs2">
     <linearGradient
@@ -88,16 +88,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.28"
-     inkscape:cx="124.62344"
-     inkscape:cy="67.176204"
+     inkscape:zoom="2.56"
+     inkscape:cx="27.162502"
+     inkscape:cy="120.12896"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g3942"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1017"
-     inkscape:window-x="1912"
-     inkscape:window-y="-8"
+     inkscape:window-height="986"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
      inkscape:window-maximized="1"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -156,17 +156,15 @@
            height="214.28572"
            width="357.14285"
            id="rect3910" /></flowRegion><flowPara
-         id="flowPara3914" /></flowRoot>    <text
-       id="text46"
-       y="196.57761"
-       x="-95.379616"
+         id="flowPara3914" /></flowRoot>    <g
+       aria-label="Σ"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:78.41694641px;line-height:1.25;font-family:'Alegreya Black';-inkscape-font-specification:'Alegreya Black, Bold';letter-spacing:0px;word-spacing:0px;fill:url(#linearGradient1474);fill-opacity:1;stroke:none;stroke-width:0.91894847"
-       xml:space="preserve"><tspan
+       id="text46">
+      <path
+         d="m -93.811277,190.22583 16.389142,-17.33014 -14.977637,-22.58408 1.411505,-4.46977 26.348094,-0.0784 q 5.959688,0 14.193468,-0.86258 l 0.862586,0.86258 q 0.07842,3.6856 0.705752,15.91865 l -9.410033,1.33308 q -0.156834,-4.6266 -1.882007,-6.66544 -1.646756,-2.03884 -5.332352,-2.03884 h -7.763278 l 9.880535,14.8208 v 2.2741 l -12.154626,12.86038 h 10.429454 q 3.371928,0 4.940267,-1.48993 1.646756,-1.56834 2.274092,-5.41077 l 9.331616,-0.70575 0.470502,0.54892 q -1.254671,12.15463 -1.254671,17.87906 l -1.646756,1.72518 -32.778284,-0.4705 -7.214359,0.78416 z"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Alegreya Black';-inkscape-font-specification:'Alegreya Black, ';fill:url(#linearGradient1474);fill-opacity:1;stroke-width:0.91894847"
-         y="196.57761"
-         x="-95.379616"
-         id="tspan44"
-         sodipodi:role="line">Σ</tspan></text>
+         id="path3746" />
+    </g>
     <flowRoot
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:85.33333588px;line-height:1.25;font-family:Alegreya;-inkscape-font-specification:Alegreya;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        id="flowRoot3938"

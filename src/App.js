@@ -94,6 +94,7 @@ class App extends React.Component {
 
     worker.port.onmessage = e => {
       if (this.state.input === e.data.input) { //prevent change if input has been updated again since message posted
+        this.setState({elunrLoaded: true})
         this.updateChoices(e.data.choices);
       }
     }
@@ -241,7 +242,10 @@ class App extends React.Component {
             onChange={e => {
               const input = e.target.value;
 
-              this.setState({input/*, elunrLoaded: false*/});
+              this.setState({
+                input,
+                elunrLoaded: this.state.choices.length //show loading message if zero results currently loaded
+              });
 
               worker.port.postMessage({input});
 
@@ -305,12 +309,24 @@ class App extends React.Component {
                     {codePoints}
                   </td>
                   <td dangerouslySetInnerHTML={{__html: 
-                    twemoji.parse(el.char, {
+                    
+                    /*new Array(34).fill(null).map((el, idx) => {
+                      return idx === 33 ? 127 : idx;
+                    }).includes(el.char.codePointAt()) && el.char.length === 1
+                    ? (`<span class='replacementChar'>
+                      
+                        ${String.fromCodePoint(
+                          el.char.codePointAt() === 127
+                          ? 9249
+                          : el.char.codePointAt() + 9216
+                        )}
+                      
+                    </span>`) //TODO
+                    :*/ twemoji.parse(el.char, {
                       base: './emoji/',
                       folder: 'twemoji',
                       ext: '.svg'
                     })
-                    // el.char
                   }} />
                 </tr>)
               })
