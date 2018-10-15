@@ -2,14 +2,15 @@ require 'json'
 
 path = './raw_data/unicode_chars.json'
 
-file = File.open(path, "r").read
+file = File.read(path)
 
-char_hash = JSON.parse(file)
+char_arr = JSON.parse(file)
 
 re = /\p{Han}+/
 
-p char_hash.length
+no_cjks = char_arr.reject { |el| el['char'].match? re }
 
-p char_hash.reject! { |el| el['char'].match? re } .length
+puts "length with CJK: #{char_arr.length}
+length without CJK: #{no_cjks.length}"
 
-File.write('./raw_data/unicode_chars_no_cjk.json', JSON.generate(char_hash))
+# File.write('./raw_data/unicode_chars_no_cjk.json', JSON.generate(char_arr))
