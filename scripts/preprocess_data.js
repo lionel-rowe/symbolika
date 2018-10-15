@@ -1,7 +1,7 @@
 
 const fs = require('fs');
 
-const [aliases, emojis, entities, unicodes] = ['aliases', 'emoji_new', 'html_entities', 'unicode_chars'].map(el => JSON.parse(fs.readFileSync(`raw_data/${el}.json`, 'utf8')));
+const [aliases, emojis, entities, unicodes] = ['aliases', 'emoji_new', 'html_entities', 'unicode_chars_no_cjk'].map(el => JSON.parse(fs.readFileSync(`raw_data/${el}.json`, 'utf8')));
 
 
 unicodes.forEach(el => {
