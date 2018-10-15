@@ -64,6 +64,3 @@ const indexContent = JSON.stringify(elunrIndex.toJSON());
 fs.writeFileSync('public/elunrIndex.json', indexContent);
 
 console.log(`Index written with length: ${indexContent.length} characters`);
-
-
-

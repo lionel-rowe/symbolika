@@ -1,5 +1,3 @@
-/*global chrome*/
-
 import React from 'react';
 import './App.css';
 import config from './config.js';
@@ -10,14 +8,16 @@ import Pagination from './Pagination.js';
 import twemoji from 'twemoji';
 import tabToNext from './tabToNext.js';
 
+const browser = window.chrome || window.browser || {};
+
 const maxSearchLength = 32;
 
 let msgs = {};
 let worker = {};
 
 const i14e = (key) => {
-  if (chrome.i18n) { //production
-    return chrome.i18n.getMessage(key);
+  if (browser.i18n) { //production
+    return browser.i18n.getMessage(key);
   } else { //dev
     return (msgs[key] && msgs[key].message);
   }
@@ -43,9 +43,9 @@ class App extends React.Component {
     document.querySelector('#searchbox').focus();
 
     this.initState();
-    if (chrome.tabs) { //production
-      chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, {closeWithChar: char});
+    if (browser.tabs) { //production
+      browser.tabs.query({active: true, currentWindow: true}, tabs => {
+        browser.tabs.sendMessage(tabs[0].id, {closeWithChar: char});
       });
     } else { //testing
       console.log('Closed with char', char);
@@ -78,9 +78,9 @@ class App extends React.Component {
       choices: choices
     });
 
-    if (chrome.tabs) { //production
-      chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, {ready: true});
+    if (browser.tabs) { //production
+      browser.tabs.query({active: true, currentWindow: true}, tabs => {
+        browser.tabs.sendMessage(tabs[0].id, {ready: true});
       });
     }
 
@@ -99,14 +99,14 @@ class App extends React.Component {
       }
     }
 
-    chrome.runtime && chrome.runtime.onMessage && chrome.runtime.onMessage.addListener((req, sender) => {
-      if (sender.id === chrome.runtime.id && req.capturedInput) {
+    browser.runtime && browser.runtime.onMessage && browser.runtime.onMessage.addListener((req, sender) => {
+      if (sender.id === browser.runtime.id && req.capturedInput) {
         // initialInput = req.capturedInput;
         this.setState({input: req.capturedInput});
       }
     });
 
-    if (!chrome.i18n) {
+    if (!browser.i18n) {
       fetch('./_locales/en/messages.json', //public
         {cache: 'no-store'}
       ).then(dat => dat.json())
@@ -117,7 +117,7 @@ class App extends React.Component {
     }
 
     document.addEventListener('click', e => {
-      if (e.target.nodeName === 'HTML' //target is backdrop 
+      if (e.target.nodeName === 'HTML' //target is backdrop
         && !this.state.input //avoid deleting user work
       ) {
         this.closeWithChar(null);
@@ -186,7 +186,7 @@ class App extends React.Component {
           document.execCommand('insertText', null, e.key); //replace default behavior
         }
       } else if (e.key === 'Enter') {
-        
+
         const selected = this.state.rowIdx > 0 ? this.state.rowIdx : 0;
 
         if (e.target.id === 'searchbox' && selected < this.state.choices.length) {
@@ -205,13 +205,13 @@ class App extends React.Component {
       }
 
       function msgListener(req, sender, thisArg) {
-        if (sender.id === chrome.runtime.id && req.reinit) { // reinit
+        if (sender.id === browser.runtime.id && req.reinit) { // reinit
           thisArg.initState();
           document.querySelector('#searchbox').focus();
         }
       }
 
-      chrome.runtime && chrome.runtime.onMessage && chrome.runtime.onMessage.addListener((req, sender) => msgListener(req, sender, this));
+      browser.runtime && browser.runtime.onMessage && browser.runtime.onMessage.addListener((req, sender) => msgListener(req, sender, this));
 
     });
 
@@ -253,7 +253,7 @@ class App extends React.Component {
             maxLength={maxSearchLength}
           />
           <div className='resultSpace'>
-          {this.state.input ? 
+          {this.state.input ?
           (<table>
             <thead>
               <tr>
@@ -308,19 +308,19 @@ class App extends React.Component {
                   <td className='trunc' title={codePoints}>
                     {codePoints}
                   </td>
-                  <td dangerouslySetInnerHTML={{__html: 
-                    
+                  <td dangerouslySetInnerHTML={{__html:
+
                     /*new Array(34).fill(null).map((el, idx) => {
                       return idx === 33 ? 127 : idx;
                     }).includes(el.char.codePointAt()) && el.char.length === 1
                     ? (`<span class='replacementChar'>
-                      
+
                         ${String.fromCodePoint(
                           el.char.codePointAt() === 127
                           ? 9249
                           : el.char.codePointAt() + 9216
                         )}
-                      
+
                     </span>`) //TODO
                     :*/ twemoji.parse(el.char, {
                       base: './emoji/',

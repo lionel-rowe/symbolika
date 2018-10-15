@@ -10,7 +10,7 @@
 
 ```
 { //https://dev.w3.org/html5/html-author/charref
-  
+
 let out = [];
 
 const dat = Array.from(document.querySelectorAll('tr')).map(el => {
@@ -22,7 +22,7 @@ dat.forEach(el => {
   const all = el.names.map(name => {
     return {name: name.match(/[^&;]+/)[0], char: el.char};
   });
-  
+
   out = out.concat(all);
 
 });
