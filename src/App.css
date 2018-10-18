@@ -1,24 +1,24 @@
 
 @font-face {
   font-family: 'Noto Sans';
-  src: url('./fonts/NotoSans-Regular.ttf') format('truetype');
+  src: url('/fonts/NotoSans-Regular.ttf') format('truetype');
 }
 
 /*@font-face {
   font-family: 'Open Sans';
-  src: url('./fonts/OpenSans-Bold.ttf') format('truetype');
+  src: url('/fonts/OpenSans-Bold.ttf') format('truetype');
   font-weight: bold;
 }
 */
 
 /*@font-face {
   font-family: 'Raleway';
-  src: url('./fonts/Raleway-Regular.ttf') format('truetype');
+  src: url('/fonts/Raleway-Regular.ttf') format('truetype');
 }*/
 
 @font-face {
   font-family: 'Raleway';
-  src: url('./fonts/Raleway-Bold.ttf') format('truetype');
+  src: url('/fonts/Raleway-Bold.ttf') format('truetype');
   font-weight: bold;
 }
 

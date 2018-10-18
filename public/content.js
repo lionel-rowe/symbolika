@@ -43,44 +43,41 @@ let hiddenInput; //needs this scope to be referred to later
 
 let isInitialDisplay = true;
 
-window.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && (e.key === ',')) {
+const activateModal = () => {
+  prevEl = document.activeElement; //before switching focus to hiddenInput
 
-    prevEl = document.activeElement; //before switching focus to hiddenInput
+  if (['INPUT', 'TEXTAREA'].includes(prevEl.tagName)) {
+    selection = {
+      type: 'simple',
+      range: {
+        selectionStart: prevEl.selectionStart, selectionEnd: prevEl.selectionEnd, selectionDirection: prevEl.selectionDirection
+      }
+    };
+  } else {
+    selection = {
+      type: 'rangy',
+      range: rangy.saveSelection()
+    };
 
-    if (['INPUT', 'TEXTAREA'].includes(prevEl.tagName)) {
-      selection = {
-        type: 'simple',
-        range: {
-          selectionStart: prevEl.selectionStart, selectionEnd: prevEl.selectionEnd, selectionDirection: prevEl.selectionDirection
-        }
-      };
-    } else {
-      selection = {
-        type: 'rangy',
-        range: rangy.saveSelection()
-      };
+    document.querySelector('.rangySelectionBoundary').style = null;
 
-      document.querySelector('.rangySelectionBoundary').style = null;
-
-    }
-
-    if (isInitialDisplay) {
-      hiddenInput = document.createElement('input');
-      hiddenInput.type = 'text';
-      hiddenInput.style = 'opacity:0;border:none;position:fixed;'
-      document.body.appendChild(hiddenInput);
-      hiddenInput.focus();
-      isInitialDisplay = false;
-    }
-
-    showModal();
   }
-});
+
+  if (isInitialDisplay) {
+    hiddenInput = document.createElement('input');
+    hiddenInput.type = 'text';
+    hiddenInput.style = 'opacity:0;border:none;position:fixed;'
+    document.body.appendChild(hiddenInput);
+    hiddenInput.focus();
+    isInitialDisplay = false;
+  }
+
+  displayModal();
+};
 
 chrome.runtime.onMessage.addListener((req, sender) => {
-  if ((sender.id === chrome.runtime.id) && req.showModal) {
-    showModal();
+  if ((sender.id === chrome.runtime.id) && req.activateModal) {
+    activateModal();
   }
 });
 
@@ -90,7 +87,7 @@ function promptReload() {
   alert(updateMsg);
 }
 
-function showModal() {
+function displayModal() {
 
   if (shouldRefresh) {
     promptReload();

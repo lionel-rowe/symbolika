@@ -6,21 +6,10 @@
   "default_locale": "en",
   "manifest_version": 2,
   "permissions": [
-    "contextMenus"
+    "contextMenus",
+    "activeTab"
   ],
-  "version": "0.1",
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "rangy-core.js",
-        "rangy-selectionsaverestore.js",
-        "content.js"
-      ]
-    }
-  ],
+  "version": "0.2",
   "background": {
     "scripts": [
       "background.js"
@@ -36,13 +25,23 @@
     "64": "favicons/symbolika_logo_64.png",
     "128": "favicons/symbolika_logo_128.png"
   },
-  "page_action": {
+  "browser_action": {
     "default_icon": {
       "16": "favicons/symbolika_logo_16.png",
       "32": "favicons/symbolika_logo_32.png",
       "64": "favicons/symbolika_logo_64.png",
       "128": "favicons/symbolika_logo_128.png"
     },
-    "default_title": "__MSG_extName__"
+    "default_title": "__MSG_extName__",
+    "default_popup": "popup.html"
+  },
+  "commands": {
+    "activateModal": {
+      "suggested_key": {
+        "default": "Ctrl+Comma",
+        "mac": "Command+Comma"
+      },
+      "description": "__MSG_shortcutName__"
+    }
   }
 }

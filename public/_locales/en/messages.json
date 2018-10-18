@@ -1,4 +1,16 @@
 {
+
+
+
+  "spaceChar": {
+    "message": " "
+  },
+  "colonChar": {
+    "message": ":"
+  },
+
+
+
   "extName": {
     "message": "Symbolika"
   },
@@ -6,6 +18,9 @@
     "message": "Insert special characters."
   },
   "ctxMenu": {
+    "message": "Insert special character"
+  },
+  "shortcutName": {
     "message": "Insert special character"
   },
   "updateMsg": {
@@ -16,6 +31,40 @@
       }
     }
   },
+
+
+
+  "popup_usageInstructions": {
+    "message": "Press $shortcut$ in any text input field, or activate $extName$ from the right-click menu.",
+    "placeholders": {
+      "shortcut": {
+        "content": "$1"
+      },
+      "extName": {
+        "content": "$2"
+      }
+    }
+  },
+  "popup_changeShortcutInstructions": {
+    "message": "You can manage keyboard shortcuts at $link$.",
+    "placeholders": {
+      "link": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_linkName": {
+    "message": "Manage Extension Shortcuts"
+  },
+  "popup_4": {
+    "message": ""
+  },
+  "popup_5": {
+    "message": ""
+  },
+
+
+
   "modal_title": {
     "message": "Symbolika"
   },
