@@ -35,7 +35,7 @@
 
 
   "popup_usageInstructions": {
-    "message": "Press $shortcut$ in any text input field, or activate $extName$ from the right-click menu.",
+    "message": "Press $shortcut$ in any text input field within a website, or activate $extName$ from the right-click menu.",
     "placeholders": {
       "shortcut": {
         "content": "$1"

@@ -15,10 +15,11 @@ const maxSearchLength = 32;
 let msgs = {};
 let worker = {};
 
-const i14e = (key) => {
+const i14e = (...args) => {
   if (browser.i18n) { //production
-    return browser.i18n.getMessage(key);
+    return browser.i18n.getMessage(...args);
   } else { //dev
+    const key = args[0];
     return (msgs[key] && msgs[key].message);
   }
 }

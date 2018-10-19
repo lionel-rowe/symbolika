@@ -23,17 +23,29 @@ heading.textContent = i14e('extName');
 const commands = chrome.commands.getAll(commands => {
   console.log(commands);
 
-  const shortcut = commands.find(el => el.name === 'activateModal').shortcut.split('+').map(key => `<kbd>${key}</kbd>`).join(' + ');
+  const shortcutRaw = commands.find(el => el.name === 'activateModal').shortcut;
+
+  // Mac shortcut format: '⌘Comma'
+  // Windows shortcut format: 'Ctrl+Comma'
+
+  const macKeyRegex = /[⌘⌥⌃⇧]/g;
+
+  const shortcutArr = macKeyRegex.test(shortcutRaw)
+    ? shortcutRaw.match(macKeyRegex).concat(shortcutRaw.replace(macKeyRegex, '').trim())
+    : shortcutRaw.split('+');
+
+  const shortcut = shortcutArr.map(key => `<kbd>${key}</kbd>`).join(' + ');
 
   let msg = `<p>${i14e('popup_usageInstructions', [shortcut, i14e('extName')])}`;
   msg += `</p><p>`;
-  msg += `${i14e('popup_changeShortcutInstructions', [`<a id='changeShortcutLink' href='#' target='_blank'>${i14e('popup_linkName')}</a>`])}</p>`;
+  msg += `${i14e('popup_changeShortcutInstructions', [`<a id='changeShortcutLink' href='#'>${i14e('popup_linkName')}</a>`])}</p>`;
 
   content.innerHTML = msg;
 
   const changeShortcutLink = document.querySelector('#changeShortcutLink');
 
   changeShortcutLink.onclick = e => {
+    e.preventDefault();
     chrome.tabs.create({url: 'chrome://extensions/shortcuts' /*'https://www.so.com'*/});
   };
 
