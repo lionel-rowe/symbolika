@@ -17,7 +17,7 @@ h1 {
 body {
   margin: 0;
   padding: 10px 20px;
-  min-width: 200px;
+  min-width: 250px;
   min-height: 150px;
   font-size: 1em;
   font-family: 'Noto Sans', 'Arial Unicode MS', 'Arial', 'Dengxian', '等线', '等線', 'Microsoft YaHei', '微软雅黑', '微軟雅黑', sans-serif;
@@ -31,4 +31,17 @@ kbd { /*https://codepen.io/dudleystorey/pen/gkrsq*/
   margin: 0 0.2em;
   box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2), 0 0 0 2px #fff inset;
   background-color: #f7f7f7;
+}
+
+a:link, a:visited {
+  color: #00d;
+  text-decoration: none;
+}
+
+a:hover, a:active {
+  text-decoration: underline;
+}
+
+a:hover:active {
+  color: #68c;
 }

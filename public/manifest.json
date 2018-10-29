@@ -12,6 +12,7 @@
   "version": "0.2.1",
   "background": {
     "scripts": [
+      "browser-polyfill.min.js",
       "background.js"
     ],
     "persistent": false

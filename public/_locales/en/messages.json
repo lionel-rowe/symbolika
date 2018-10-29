@@ -1,7 +1,4 @@
 {
-
-
-
   "spaceChar": {
     "message": " "
   },
@@ -35,32 +32,43 @@
 
 
   "popup_usageInstructions": {
-    "message": "Press $shortcut$ in any text input field within a website, or activate $extName$ from the right-click menu.",
+    "message": "Press $shortcut$ or <strong>right-click &gt; $ctxMenuMsg$</strong> in any text input field within the content area of your browser [$showHideUsableAreaLink$].",
     "placeholders": {
       "shortcut": {
         "content": "$1"
       },
-      "extName": {
+      "ctxMenuMsg": {
         "content": "$2"
+      },
+      "showHideUsableAreaLink": {
+        "content": "$3"
       }
     }
   },
   "popup_changeShortcutInstructions": {
-    "message": "You can manage keyboard shortcuts at $link$.",
+    "message": "You can also $link$.",
     "placeholders": {
       "link": {
         "content": "$1"
       }
     }
   },
-  "popup_linkName": {
-    "message": "Manage Extension Shortcuts"
+  "popup_changeShortcutsLinkName": {
+    "message": "customize keyboard shortcuts"
   },
-  "popup_4": {
-    "message": ""
+  "popup_unavailableMsg": {
+    "message": "Sorry! For security reasons, $extName$ is not available on the <em>$pageTitle$</em> page.",
+    "placeholders": {
+      "extName": {
+        "content": "$1"
+      },
+      "pageTitle": {
+        "content": "$2"
+      }
+    }
   },
-  "popup_5": {
-    "message": ""
+  "popup_showUsableAreaLinkName": {
+    "message": "show content area"
   },
 
 
