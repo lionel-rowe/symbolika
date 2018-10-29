@@ -57,7 +57,7 @@
     "message": "customize keyboard shortcuts"
   },
   "popup_unavailableMsg": {
-    "message": "Sorry! For security reasons, $extName$ is not available on the <em>$pageTitle$</em> page.",
+    "message": "$extName$ is not available on the <em>$pageTitle$</em> page.</p><p>To use it, navigate to a normal website or web app.",
     "placeholders": {
       "extName": {
         "content": "$1"

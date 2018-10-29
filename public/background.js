@@ -3,20 +3,21 @@ chrome.runtime.onConnect.addListener(port => {
   // noop
 }); //accept connection
 
-
 const currentlyRunningIn = [];
 const currentlyHlFramed = [];
 
+const urlMatchers = ['http://', 'https://', 'file:///'];
 
-const checkAvailability = () => {
+const checkActionError = () => {
   return browser.tabs.executeScript({
     code: '' //noop
-  })
-  .then(res => true, err => {
-    return err.message === 'Cannot access contents of the page. Extension manifest must request permission to access the respective host.' ? true : false;
-    // this error simply means user has not yet initiated any extension-related action;
-    // any other error message means the page cannot be accessed by extensions
-  });
+  }).then(res => null, err => err);
+};
+
+const checkAvailabilityAfterUserAction = () => {
+  return browser.tabs.executeScript({
+    code: '' //noop
+  }).then(res => true, err => false);
 };
 
 const clearTabState = (tabId) => {
@@ -48,7 +49,7 @@ const handleMsg = (tabs, req) => {
 
   const tabId = tabs[0].id;
 
-  checkAvailability().then(isAvailable => {
+  checkAvailabilityAfterUserAction().then(isAvailable => {
     if (!isAvailable) {
       chrome.runtime.sendMessage({tabUnvailable: true, pageTitle: tabs[0].title});
     } else {
@@ -80,7 +81,8 @@ chrome.contextMenus.create({
   id: ctxMenuId,
   title: chrome.i18n.getMessage('ctxMenu'),
   contexts: ['editable'],
-  visible: false
+  visible: false,
+  documentUrlPatterns: urlMatchers.map(el => `${el}*/*`)
 });
 
 
@@ -100,29 +102,61 @@ const injectScripts = (tabId, callback) => {
 const activateModal = tabId => chrome.tabs.sendMessage(tabId, {activateModal: true});
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  injectScripts(tab.id, activateModal);
-  //no need to check availability; ctx menu already disabled on unavailable tabs
+
+  checkAvailabilityAfterUserAction().then(isAvailable => {
+
+    // chrome.contextMenus.update(ctxMenuId, {
+    //   visible: isAvailable
+    // });
+
+    if (isAvailable) {
+      injectScripts(tab.id, activateModal); // TODO
+    } else {
+
+      // chrome.tabs.update(tab.id, {
+      //     url: 'url'
+      // });
+
+      console.log('Extension not available on New Tab page.');
+    }
+  });
 });
 
 chrome.commands.onCommand.addListener(command => {
   if (command === 'activateModal') {
-    checkAvailability().then(isAvailable => {
-      if (isAvailable) {
+
+    const getTabInfo = browser.tabs.query({active: true, currentWindow: true});
+
+    const getAvailability = checkAvailabilityAfterUserAction();
+
+    Promise.all([getTabInfo, getAvailability]).then((info) => {
+      const [tabs, isAvailable] = info;
+
+      const matchesScheme = tabs && tabs[0] && tabs[0].url && urlMatchers.some(scheme => tabs[0].url.startsWith(scheme));
+
+      if (isAvailable && matchesScheme) {
         chrome.tabs.query({active: true, currentWindow: true}, tabs => {
           injectScripts(tabs[0].id, activateModal);
         });
       }
+
     });
+
   }
 });
 
 const setCtxMenuAvailability = () => {
-  checkAvailability().then(isAvailable => {
+  checkActionError().then(err => {
+    const permissionsNotRequestedMsg = 'Cannot access contents of the page. Extension manifest must request permission to access the respective host.';
+    // this is also the msg shown for `chrome://newtab` (which is unavailable)
+
+    const isAvailable = !err || (err.message === permissionsNotRequestedMsg);
+
     chrome.contextMenus.update(ctxMenuId, {
-      visible: isAvailable
+      visible: isAvailable,
     });
-  })
-}
+  });
+};
 
 
 
